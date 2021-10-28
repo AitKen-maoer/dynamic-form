@@ -115,3 +115,28 @@ export function param2Obj(url) {
   })
   return obj
 }
+
+export function createRulesByForm(form = {}, rules = [
+  { required: true, message: '此项是必填的', trigger: ['blur', 'change'] }
+]) {
+  const rulesStr = JSON.stringify(rules) // 拷贝一个默认规则转为字符串存储,防止后面操作规则对象修改到了原规则
+  const rulesRequired = {} // 创建规则对象
+  const lables = form?.$el?.getElementsByTagName('label')// 获取所有需要验证的lable
+  if (lables && lables.length > 0) {
+    lables.forEach(it => { // 循环操作lable
+      rules = JSON.parse(rulesStr) // 将规则转为对象
+      const rule = it.getAttribute('for') // 获取需要规则的对象名 即prop值
+      if (rule && rule.length > 0) {
+        const msg = it.parentElement.getAttribute('msg') // 获取自己配置的msg
+        rules.forEach(r => { // 循环修改rules的msg
+          if (msg && msg.length > 0) {
+            r.message = msg
+          }
+        })
+        rulesRequired[rule] = rules // 添加对应的rules
+      }
+    })
+  }
+
+  return rulesRequired
+}

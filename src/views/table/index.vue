@@ -1,5 +1,10 @@
 <template>
   <div class="app-container">
+    <A :key="key+'a'" />
+    <B :key="key+'b'" />
+    父组件 {{ input1 }}
+    <el-input v-model="input1" />
+    <!-- <el-button type="primary" @click="publicRules">按钮</el-button>
     <el-table
       v-loading="listLoading"
       :data="list"
@@ -8,45 +13,19 @@
       fit
       highlight-current-row
     >
-      <el-table-column align="center" label="ID" width="95">
-        <template slot-scope="scope">
-          {{ scope.$index }}
-        </template>
-      </el-table-column>
-      <el-table-column label="Title">
-        <template slot-scope="scope">
-          {{ scope.row.title }}
-        </template>
-      </el-table-column>
-      <el-table-column label="Author" width="110" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="Pageviews" width="110" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.pageviews }}
-        </template>
-      </el-table-column>
-      <el-table-column class-name="status-col" label="Status" width="110" align="center">
-        <template slot-scope="scope">
-          <el-tag :type="scope.row.status | statusFilter">{{ scope.row.status }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" prop="created_at" label="Display_time" width="200">
-        <template slot-scope="scope">
-          <i class="el-icon-time" />
-          <span>{{ scope.row.display_time }}</span>
-        </template>
-      </el-table-column>
-    </el-table>
+      <el-table-column v-for="(item,key) in data" :key="key" :label="item.laber" :prop="item.prop" />
+    </el-table> -->
   </div>
 </template>
 
 <script>
 import { getList } from '@/api/table'
+import myMinix from './minix'
+import A from './a'
+import B from './b'
 
 export default {
+  components: { A, B },
   filters: {
     statusFilter(status) {
       const statusMap = {
@@ -57,14 +36,40 @@ export default {
       return statusMap[status]
     }
   },
+  mixins: [myMinix],
   data() {
     return {
       list: null,
-      listLoading: true
+      listLoading: true,
+      data: [
+        {
+          laber: '姓名',
+          prop: 'author'
+        },
+        {
+          laber: '时间',
+          prop: 'display_time'
+        }
+      ],
+      tableListMap: [
+        { laber: '张三', value: 1 },
+        { laber: '张三', value: 2 },
+        { laber: '李四', value: 1 },
+        { laber: '王五', value: 1 },
+        { laber: '赵六', value: 1 }
+      ]
     }
   },
   created() {
     this.fetchData()
+    const a = this.tableListMap.find(x => {
+      // eslint-disable-next-line no-return-assign
+      return x.laber = '张三'
+    })
+    console.log(a, '111')
+  },
+  mounted() {
+    this.speak()
   },
   methods: {
     fetchData() {
@@ -73,6 +78,9 @@ export default {
         this.list = response.data.items
         this.listLoading = false
       })
+    },
+    speak() {
+      this.objs.class = 'end'
     }
   }
 }

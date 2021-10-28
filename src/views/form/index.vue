@@ -1,85 +1,121 @@
 <template>
-  <div class="app-container">
-    <el-form ref="form" :model="form" label-width="120px">
-      <el-form-item label="Activity name">
-        <el-input v-model="form.name" />
-      </el-form-item>
-      <el-form-item label="Activity zone">
-        <el-select v-model="form.region" placeholder="please select your zone">
-          <el-option label="Zone one" value="shanghai" />
-          <el-option label="Zone two" value="beijing" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="Activity time">
-        <el-col :span="11">
-          <el-date-picker v-model="form.date1" type="date" placeholder="Pick a date" style="width: 100%;" />
-        </el-col>
-        <el-col :span="2" class="line">-</el-col>
-        <el-col :span="11">
-          <el-time-picker v-model="form.date2" type="fixed-time" placeholder="Pick a time" style="width: 100%;" />
-        </el-col>
-      </el-form-item>
-      <el-form-item label="Instant delivery">
-        <el-switch v-model="form.delivery" />
-      </el-form-item>
-      <el-form-item label="Activity type">
-        <el-checkbox-group v-model="form.type">
-          <el-checkbox label="Online activities" name="type" />
-          <el-checkbox label="Promotion activities" name="type" />
-          <el-checkbox label="Offline activities" name="type" />
-          <el-checkbox label="Simple brand exposure" name="type" />
-        </el-checkbox-group>
-      </el-form-item>
-      <el-form-item label="Resources">
-        <el-radio-group v-model="form.resource">
-          <el-radio label="Sponsor" />
-          <el-radio label="Venue" />
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item label="Activity form">
-        <el-input v-model="form.desc" type="textarea" />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="onSubmit">Create</el-button>
-        <el-button @click="onCancel">Cancel</el-button>
-      </el-form-item>
-    </el-form>
+  <div>
+    <div class="index">
+      <el-container>
+        <el-header height="200px">
+          <div>
+            <el-descriptions class="margin-top" title="表单" :column="3" :size="size" border>
+              <el-descriptions-item>
+                <template slot="label">
+                  表单JSON
+                </template>
+                <el-input v-model="form.desc" type="textarea" @change="textareaChange" />
+              </el-descriptions-item>
+            </el-descriptions>
+          </div>
+        </el-header>
+        <el-container>
+          <!-- 成品区 -->
+          <el-main>
+            <mainCommon
+              v-if="form.desc"
+              ref="mainCommon"
+              v-model="mainCommonForm"
+              :data="form.desc"
+              @onSubmit="showADDJSON"
+              @change="mainCommonChange"
+            />
+          </el-main>
+        </el-container>
+      </el-container>
+    </div>
   </div>
 </template>
 
 <script>
+/**
+ * 传入数据data，其data是生成表单的json
+ * 提交回调函数 onSubmit(valid, object)
+ * 触发表单项change 函数 mainCommonChange(index,data)
+ */
+import mainCommon from './generate-form.vue'
+import myMinix from './minix'
+
 export default {
+  components: {
+    mainCommon
+  },
+  mixins: [myMinix],
   data() {
     return {
+      mainCommonForm: {},
+      size: 'medium',
       form: {
-        name: '',
-        region: '',
-        date1: '',
-        date2: '',
-        delivery: false,
-        type: [],
-        resource: '',
         desc: ''
-      }
+      },
+      FormdataList: []
     }
   },
   methods: {
-    onSubmit() {
-      this.$message('submit!')
+    /**
+     * 立即提交回调
+     */
+    onSuccessAsideCommon() {
+      const self = this
+      self.drawer = false
     },
-    onCancel() {
-      this.$message({
-        message: 'cancel!',
-        type: 'warning'
-      })
+    textareaChange() {
+      const self = this
+      const d = JSON.parse(self.form.desc)
+      self.mainCommonForm = d.form
+    },
+    showADDJSON(valid, object) {
+      console.log(this.$refs.mainCommon.formdataList)
+      console.log(this.mainCommonForm)
+      console.log(this.form)
+    },
+    /**
+     * 表单change
+     * 某个项change
+     * @param {index} 值的改变返回当前项的索引
+     * @param {data} 值的改变返回当前项的json
+     */
+    mainCommonChange(index, data) {
+
     }
   }
 }
 </script>
-
 <style scoped>
-.line{
-  text-align: center;
+.index{
+    border-bottom: 1px solid #f0f0f0;
 }
-</style>
+.el-header, .el-footer {
+  color: #333;
+  border-bottom: 1px solid #f0f0f0;
+  text-align: center;
+  line-height: 60px;
+}
+.el-aside {
+  border-left: 1px solid #f0f0f0;
+  color: #333;
+}
 
+.el-main {
+  color: #333;
+  line-height: 160px;
+}
+
+body > .el-container {
+  margin-bottom: 40px;
+}
+/*
+.el-container:nth-child(5) .el-aside,
+.el-container:nth-child(6) .el-aside {
+  line-height: 260px;
+}
+
+.el-container:nth-child(7) .el-aside {
+  line-height: 320px;
+} */
+</style>
